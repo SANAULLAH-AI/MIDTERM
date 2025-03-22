@@ -29,7 +29,7 @@ const Tab = createBottomTabNavigator();
 // Theme Context
 const ThemeContext = React.createContext();
 const ThemeProvider = ({ children }) => {
-  const [isDark, setIsDark] = useState(false);
+  const [isDark, setIsDark] = useState(true);
   const theme = isDark ? darkTheme : lightTheme;
   return (
     <ThemeContext.Provider value={{ theme, toggleTheme: () => setIsDark(!isDark) }}>
@@ -62,17 +62,17 @@ const getData = async (key) => {
 const fetchJobs = async () => {
   try {
     const response = await axios.get('https://jsonplaceholder.typicode.com/posts');
-    const categories = ['Tech', 'Design', 'Marketing', 'Finance', 'Sales'];
+    const categories = ['Tech', 'Design', 'Marketing', 'Finance', 'Sales', 'Management'];
     return response.data.map(post => ({
       id: post.id.toString(),
       title: post.title,
       company: `Company ${post.userId}`,
       description: post.body,
-      location: ['New York', 'London', 'Remote', 'Tokyo', 'Sydney'][Math.floor(Math.random() * 5)],
-      salary: `${Math.floor(Math.random() * 50 + 50)}k - ${Math.floor(Math.random() * 50 + 100)}k`,
+      location: ['New York', 'London', 'Remote', 'Tokyo', 'Dubai'][Math.floor(Math.random() * 5)],
+      salary: Math.floor(Math.random() * 70 + 80), // In thousands (80k-150k)
       category: categories[Math.floor(Math.random() * categories.length)],
       posted: new Date().toLocaleDateString(),
-      requirements: ['3+ years experience', 'Bachelor’s degree', 'Strong communication skills'],
+      requirements: ['5+ years experience', 'Advanced degree', 'Leadership skills'],
     }));
   } catch (error) {
     console.error('Error fetching jobs:', error);
@@ -85,7 +85,7 @@ const Popup = ({ message, onClose }) => {
   const { theme } = useTheme();
   const fadeAnim = useState(new Animated.Value(0))[0];
   useEffect(() => {
-    Animated.timing(fadeAnim, { toValue: 1, duration: 300, useNativeDriver: true }).start();
+    Animated.timing(fadeAnim, { toValue: 1, duration: 400, useNativeDriver: true }).start();
   }, [fadeAnim]);
   return (
     <Animated.View style={[styles.popup, { backgroundColor: theme.popupBackground, opacity: fadeAnim }]}>
@@ -109,10 +109,10 @@ const OnboardingScreen = ({ navigation }) => {
     <LinearGradient colors={theme.gradient} style={styles.fullScreen}>
       <ScrollView contentContainerStyle={styles.onboardingScroll}>
         <Image source={{ uri: 'https://via.placeholder.com/200' }} style={styles.onboardingImage} />
-        <Text style={[styles.title, { color: theme.text }]}>Welcome to JobSeeker</Text>
-        <Text style={[styles.subtitle, { color: theme.text }]}>Find your dream job with ease</Text>
+        <Text style={[styles.title, { color: theme.text }]}>Welcome to JobSeeker Elite</Text>
+        <Text style={[styles.subtitle, { color: theme.text }]}>Your Path to Prestigious Careers</Text>
         <TouchableOpacity style={[styles.button, { backgroundColor: theme.button }]} onPress={handleStart}>
-          <Text style={styles.buttonText}>Get Started</Text>
+          <Text style={styles.buttonText}>Embark Now</Text>
         </TouchableOpacity>
       </ScrollView>
     </LinearGradient>
@@ -128,7 +128,7 @@ const LoginScreen = ({ navigation }) => {
 
   const handleLogin = async () => {
     if (email && password) {
-      const user = { email, name: email.split('@')[0], bio: '', profilePhoto: null, coverPhoto: null, skills: [], experience: '' };
+      const user = { email, name: email.split('@')[0], bio: '', profilePhoto: null, coverPhoto: null, skills: [], experience: '', portfolio: [], applications: 0 };
       await storeData('user', user);
       setPopup('Login Successful');
       setTimeout(() => {
@@ -144,9 +144,9 @@ const LoginScreen = ({ navigation }) => {
     <LinearGradient colors={theme.gradient} style={styles.fullScreen}>
       <ScrollView contentContainerStyle={styles.authScroll}>
         <Image source={{ uri: 'https://via.placeholder.com/150' }} style={styles.logo} />
-        <Text style={[styles.title, { color: theme.text }]}>Welcome Back</Text>
+        <Text style={[styles.title, { color: theme.text }]}>Elite Access</Text>
         <TextInput
-          style={[styles.input, { borderColor: theme.border, color: theme.text }]}
+          style={[styles.input, { borderColor: theme.border, color: theme.text, backgroundColor: theme.inputBackground }]}
           placeholder="Email"
           placeholderTextColor={theme.placeholder}
           value={email}
@@ -154,7 +154,7 @@ const LoginScreen = ({ navigation }) => {
           autoCapitalize="none"
         />
         <TextInput
-          style={[styles.input, { borderColor: theme.border, color: theme.text }]}
+          style={[styles.input, { borderColor: theme.border, color: theme.text, backgroundColor: theme.inputBackground }]}
           placeholder="Password"
           placeholderTextColor={theme.placeholder}
           value={password}
@@ -172,7 +172,7 @@ const LoginScreen = ({ navigation }) => {
             <Text style={[styles.link, { color: theme.link }]}>Forgot Password?</Text>
           </TouchableOpacity>
           <TouchableOpacity onPress={() => navigation.replace('Main')}>
-            <Text style={[styles.link, { color: theme.link }]}>Guest</Text>
+            <Text style={[styles.link, { color: theme.link }]}>Guest Access</Text>
           </TouchableOpacity>
         </View>
         {popup && <Popup message={popup} onClose={() => setPopup(null)} />}
@@ -189,7 +189,7 @@ const SignupScreen = ({ navigation }) => {
 
   const handleSignup = async () => {
     if (email && password) {
-      const user = { email, name: email.split('@')[0], bio: '', profilePhoto: null, coverPhoto: null, skills: [], experience: '' };
+      const user = { email, name: email.split('@')[0], bio: '', profilePhoto: null, coverPhoto: null, skills: [], experience: '', portfolio: [], applications: 0 };
       await storeData('user', user);
       setPopup('Signup Successful');
       setTimeout(() => {
@@ -205,9 +205,9 @@ const SignupScreen = ({ navigation }) => {
     <LinearGradient colors={theme.gradient} style={styles.fullScreen}>
       <ScrollView contentContainerStyle={styles.authScroll}>
         <Image source={{ uri: 'https://via.placeholder.com/150' }} style={styles.logo} />
-        <Text style={[styles.title, { color: theme.text }]}>Join JobSeeker</Text>
+        <Text style={[styles.title, { color: theme.text }]}>Join the Elite</Text>
         <TextInput
-          style={[styles.input, { borderColor: theme.border, color: theme.text }]}
+          style={[styles.input, { borderColor: theme.border, color: theme.text, backgroundColor: theme.inputBackground }]}
           placeholder="Email"
           placeholderTextColor={theme.placeholder}
           value={email}
@@ -215,7 +215,7 @@ const SignupScreen = ({ navigation }) => {
           autoCapitalize="none"
         />
         <TextInput
-          style={[styles.input, { borderColor: theme.border, color: theme.text }]}
+          style={[styles.input, { borderColor: theme.border, color: theme.text, backgroundColor: theme.inputBackground }]}
           placeholder="Password"
           placeholderTextColor={theme.placeholder}
           value={password}
@@ -226,7 +226,7 @@ const SignupScreen = ({ navigation }) => {
           <Text style={styles.buttonText}>Signup</Text>
         </TouchableOpacity>
         <TouchableOpacity onPress={() => navigation.navigate('Login')}>
-          <Text style={[styles.link, { color: theme.link }]}>Already have an account? Login</Text>
+          <Text style={[styles.link, { color: theme.link }]}>Already Elite? Login</Text>
         </TouchableOpacity>
         {popup && <Popup message={popup} onClose={() => setPopup(null)} />}
       </ScrollView>
@@ -250,9 +250,9 @@ const ForgotPasswordScreen = ({ navigation }) => {
   return (
     <LinearGradient colors={theme.gradient} style={styles.fullScreen}>
       <ScrollView contentContainerStyle={styles.authScroll}>
-        <Text style={[styles.title, { color: theme.text }]}>Reset Password</Text>
+        <Text style={[styles.title, { color: theme.text }]}>Reset Access</Text>
         <TextInput
-          style={[styles.input, { borderColor: theme.border, color: theme.text }]}
+          style={[styles.input, { borderColor: theme.border, color: theme.text, backgroundColor: theme.inputBackground }]}
           placeholder="Enter your email"
           placeholderTextColor={theme.placeholder}
           value={email}
@@ -273,22 +273,32 @@ const ForgotPasswordScreen = ({ navigation }) => {
 // Main App Screens
 const HomeScreen = () => {
   const { theme } = useTheme();
+  const [notification, setNotification] = useState(true);
+
   return (
     <LinearGradient colors={theme.gradient} style={styles.fullScreen}>
       <ScrollView contentContainerStyle={styles.homeScroll}>
-        <Text style={[styles.title, { color: theme.text }]}>JobSeeker Dashboard</Text>
-        <Text style={[styles.subtitle, { color: theme.text }]}>Unlock Your Career Potential</Text>
-        <Image source={{ uri: 'https://via.placeholder.com/300x180' }} style={styles.banner} />
-        <View style={styles.stats}>
-          <View style={[styles.statCard, { backgroundColor: theme.card }]}>
-            <Ionicons name="briefcase" size={40} color={theme.button} />
-            <Text style={[styles.statNumber, { color: theme.text }]}>75+</Text>
-            <Text style={{ color: theme.text }}>Jobs Available</Text>
+        {notification && (
+          <View style={[styles.notificationBanner, { backgroundColor: theme.button }]}>
+            <Text style={styles.notificationText}>New Elite Jobs Available!</Text>
+            <TouchableOpacity onPress={() => setNotification(false)}>
+              <Ionicons name="close" size={24} color="#fff" />
+            </TouchableOpacity>
           </View>
-          <View style={[styles.statCard, { backgroundColor: theme.card }]}>
-            <Ionicons name="paper-plane" size={40} color={theme.button} />
-            <Text style={[styles.statNumber, { color: theme.text }]}>12</Text>
-            <Text style={{ color: theme.text }}>Applications</Text>
+        )}
+        <Text style={[styles.title, { color: theme.text }]}>JobSeeker Elite</Text>
+        <Text style={[styles.subtitle, { color: theme.text }]}>Unrivaled Career Excellence</Text>
+        <Image source={{ uri: 'https://via.placeholder.com/300x200' }} style={styles.banner} />
+        <View style={styles.stats}>
+          <View style={[styles.statCard, { backgroundColor: theme.card, borderColor: theme.border }]}>
+            <Ionicons name="briefcase" size={50} color={theme.button} />
+            <Text style={[styles.statNumber, { color: theme.text }]}>120+</Text>
+            <Text style={{ color: theme.text, fontWeight: 'bold' }}>Elite Jobs</Text>
+          </View>
+          <View style={[styles.statCard, { backgroundColor: theme.card, borderColor: theme.border }]}>
+            <Ionicons name="paper-plane" size={50} color={theme.button} />
+            <Text style={[styles.statNumber, { color: theme.text }]}>18</Text>
+            <Text style={{ color: theme.text, fontWeight: 'bold' }}>Applications</Text>
           </View>
         </View>
       </ScrollView>
@@ -299,34 +309,53 @@ const HomeScreen = () => {
 const JobScreen = ({ navigation }) => {
   const [jobs, setJobs] = useState([]);
   const [filteredJobs, setFilteredJobs] = useState([]);
+  const [savedJobs, setSavedJobs] = useState([]);
   const [search, setSearch] = useState('');
   const [category, setCategory] = useState('All');
+  const [location, setLocation] = useState('All');
+  const [salaryRange, setSalaryRange] = useState([0, 200]);
   const [selectedJob, setSelectedJob] = useState(null);
   const [popup, setPopup] = useState(null);
   const { theme } = useTheme();
 
   useEffect(() => {
-    fetchJobs().then(data => {
-      setJobs(data);
-      setFilteredJobs(data);
-    });
+    const loadData = async () => {
+      const jobsData = await fetchJobs();
+      const saved = await getData('savedJobs') || [];
+      setJobs(jobsData);
+      setFilteredJobs(jobsData);
+      setSavedJobs(saved);
+    };
+    loadData();
   }, []);
 
   const handleSearch = (text) => {
     setSearch(text);
-    filterJobs(text, category);
+    filterJobs(text, category, location, salaryRange);
   };
 
   const handleCategory = (cat) => {
     setCategory(cat);
-    filterJobs(search, cat);
+    filterJobs(search, cat, location, salaryRange);
   };
 
-  const filterJobs = (text, cat) => {
+  const handleLocation = (loc) => {
+    setLocation(loc);
+    filterJobs(search, category, loc, salaryRange);
+  };
+
+  const handleSalary = (range) => {
+    setSalaryRange(range);
+    filterJobs(search, category, location, range);
+  };
+
+  const filterJobs = (text, cat, loc, range) => {
     let filtered = jobs.filter(
       job => job.title.toLowerCase().includes(text.toLowerCase()) || job.company.toLowerCase().includes(text.toLowerCase())
     );
     if (cat !== 'All') filtered = filtered.filter(job => job.category === cat);
+    if (loc !== 'All') filtered = filtered.filter(job => job.location === loc);
+    filtered = filtered.filter(job => job.salary >= range[0] && job.salary <= range[1]);
     setFilteredJobs(filtered);
   };
 
@@ -334,51 +363,95 @@ const JobScreen = ({ navigation }) => {
     navigation.navigate('JobApplication', { job });
   };
 
+  const toggleSaveJob = async (job) => {
+    const isSaved = savedJobs.some(saved => saved.id === job.id);
+    let updatedSavedJobs;
+    if (isSaved) {
+      updatedSavedJobs = savedJobs.filter(saved => saved.id !== job.id);
+      setPopup('Job Unsaved');
+    } else {
+      updatedSavedJobs = [...savedJobs, job];
+      setPopup('Job Saved');
+    }
+    setSavedJobs(updatedSavedJobs);
+    await storeData('savedJobs', updatedSavedJobs);
+    setTimeout(() => setPopup(null), 1000);
+  };
+
   return (
-    <View style={[styles.fullScreen, { backgroundColor: theme.background }]}>
+    <LinearGradient colors={theme.gradient} style={styles.fullScreen}>
       <TextInput
-        style={[styles.input, { borderColor: theme.border, color: theme.text }]}
-        placeholder="Search jobs..."
+        style={[styles.input, { borderColor: theme.border, color: theme.text, backgroundColor: theme.inputBackground }]}
+        placeholder="Search Elite Jobs..."
         placeholderTextColor={theme.placeholder}
         value={search}
         onChangeText={handleSearch}
       />
-      <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.categoryScroll}>
-        {['All', 'Tech', 'Design', 'Marketing', 'Finance', 'Sales'].map(cat => (
-          <TouchableOpacity
-            key={cat}
-            style={[styles.categoryButton, { backgroundColor: category === cat ? theme.button : theme.card }]}
-            onPress={() => handleCategory(cat)}
-          >
-            <Text style={[styles.categoryText, { color: category === cat ? '#fff' : theme.text }]}>{cat}</Text>
-          </TouchableOpacity>
-        ))}
-      </ScrollView>
+      <View style={styles.filterContainer}>
+        <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.categoryScroll}>
+          {['All', 'Tech', 'Design', 'Marketing', 'Finance', 'Sales', 'Management'].map(cat => (
+            <TouchableOpacity
+              key={cat}
+              style={[styles.categoryButton, { backgroundColor: category === cat ? theme.button : theme.card, borderColor: theme.border }]}
+              onPress={() => handleCategory(cat)}
+            >
+              <Text style={[styles.categoryText, { color: category === cat ? '#fff' : theme.text }]}>{cat}</Text>
+            </TouchableOpacity>
+          ))}
+        </ScrollView>
+        <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.categoryScroll}>
+          {['All', 'New York', 'London', 'Remote', 'Tokyo', 'Dubai'].map(loc => (
+            <TouchableOpacity
+              key={loc}
+              style={[styles.categoryButton, { backgroundColor: location === loc ? theme.button : theme.card, borderColor: theme.border }]}
+              onPress={() => handleLocation(loc)}
+            >
+              <Text style={[styles.categoryText, { color: location === loc ? '#fff' : theme.text }]}>{loc}</Text>
+            </TouchableOpacity>
+          ))}
+        </ScrollView>
+      </View>
       <FlatList
         data={filteredJobs}
-        renderItem={({ item }) => (
-          <TouchableOpacity style={[styles.card, { backgroundColor: theme.card }]} onPress={() => setSelectedJob(item)}>
-            <Text style={[styles.cardTitle, { color: theme.text }]}>{item.title}</Text>
-            <Text style={{ color: theme.text }}>{item.company} - {item.location}</Text>
-            <Text style={{ color: theme.text }}>{item.salary} | {item.category}</Text>
-            <Text style={[styles.cardDescription, { color: theme.text }]}>{item.description.slice(0, 80)}...</Text>
-            <Text style={{ color: theme.placeholder, fontSize: 12 }}>Posted: {item.posted}</Text>
-          </TouchableOpacity>
-        )}
+        renderItem={({ item }) => {
+          const isSaved = savedJobs.some(saved => saved.id === item.id);
+          const scaleAnim = new Animated.Value(1);
+          return (
+            <TouchableOpacity
+              style={[styles.card, { backgroundColor: theme.card, borderColor: theme.border }]}
+              onPress={() => setSelectedJob(item)}
+              onPressIn={() => Animated.spring(scaleAnim, { toValue: 0.98, useNativeDriver: true }).start()}
+              onPressOut={() => Animated.spring(scaleAnim, { toValue: 1, useNativeDriver: true }).start()}
+            >
+              <Animated.View style={{ transform: [{ scale: scaleAnim }] }}>
+                <Text style={[styles.cardTitle, { color: theme.text }]}>{item.title}</Text>
+                <Text style={{ color: theme.text, fontWeight: '500' }}>{item.company} - {item.location}</Text>
+                <Text style={{ color: theme.button }}>{item.salary}k | {item.category}</Text>
+                <Text style={[styles.cardDescription, { color: theme.text }]}>{item.description.slice(0, 80)}...</Text>
+                <View style={styles.cardActions}>
+                  <TouchableOpacity onPress={() => toggleSaveJob(item)}>
+                    <Ionicons name={isSaved ? 'bookmark' : 'bookmark-outline'} size={24} color={theme.button} />
+                  </TouchableOpacity>
+                </View>
+              </Animated.View>
+            </TouchableOpacity>
+          );
+        }}
         keyExtractor={(item) => item.id}
+        contentContainerStyle={{ paddingTop: 130 }} // Space for filters
       />
-      <Modal visible={!!selectedJob} animationType="slide" transparent>
+      <Modal visible={!!selectedJob} animationType="fade" transparent>
         <View style={styles.modalOverlay}>
           <LinearGradient colors={theme.gradient} style={styles.modalContent}>
             {selectedJob && (
               <>
                 <Text style={[styles.title, { color: theme.text }]}>{selectedJob.title}</Text>
                 <Text style={[styles.subtitle, { color: theme.text }]}>{selectedJob.company} - {selectedJob.location}</Text>
-                <Text style={{ color: theme.text, marginVertical: 10 }}>{selectedJob.salary} | {selectedJob.category}</Text>
+                <Text style={{ color: theme.button, marginVertical: 10 }}>{selectedJob.salary}k | {selectedJob.category}</Text>
                 <Text style={[styles.cardDescription, { color: theme.text }]}>{selectedJob.description}</Text>
                 <Text style={[styles.subtitle, { color: theme.text }]}>Requirements:</Text>
                 {selectedJob.requirements.map((req, idx) => (
-                  <Text key={idx} style={{ color: theme.text, marginLeft: 10 }}>• {req}</Text>
+                  <Text key={idx} style={{ color: theme.text, marginLeft: 15, fontSize: 14 }}>• {req}</Text>
                 ))}
                 <View style={styles.modalButtons}>
                   <TouchableOpacity style={[styles.button, { backgroundColor: theme.button }]} onPress={() => handleApply(selectedJob)}>
@@ -394,7 +467,7 @@ const JobScreen = ({ navigation }) => {
         </View>
       </Modal>
       {popup && <Popup message={popup} onClose={() => setPopup(null)} />}
-    </View>
+    </LinearGradient>
   );
 };
 
@@ -417,8 +490,13 @@ const JobApplicationScreen = ({ route, navigation }) => {
     }
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     if (resume && coverLetter) {
+      const user = await getData('user');
+      if (user) {
+        user.applications += 1;
+        await storeData('user', user);
+      }
       setPopup('Application Submitted');
       setTimeout(() => {
         navigation.goBack();
@@ -438,7 +516,7 @@ const JobApplicationScreen = ({ route, navigation }) => {
           <Text style={styles.buttonText}>{resume ? 'Resume Uploaded' : 'Upload Resume'}</Text>
         </TouchableOpacity>
         <TextInput
-          style={[styles.input, { borderColor: theme.border, color: theme.text, height: 150 }]}
+          style={[styles.input, { borderColor: theme.border, color: theme.text, height: 150, backgroundColor: theme.inputBackground }]}
           placeholder="Cover Letter"
           placeholderTextColor={theme.placeholder}
           value={coverLetter}
@@ -450,6 +528,38 @@ const JobApplicationScreen = ({ route, navigation }) => {
         </TouchableOpacity>
         {popup && <Popup message={popup} onClose={() => setPopup(null)} />}
       </ScrollView>
+    </LinearGradient>
+  );
+};
+
+const SavedJobsScreen = () => {
+  const [savedJobs, setSavedJobs] = useState([]);
+  const { theme } = useTheme();
+
+  useEffect(() => {
+    const loadSavedJobs = async () => {
+      const saved = await getData('savedJobs') || [];
+      setSavedJobs(saved);
+    };
+    loadSavedJobs();
+  }, []);
+
+  return (
+    <LinearGradient colors={theme.gradient} style={styles.fullScreen}>
+      <Text style={[styles.title, { color: theme.text, marginTop: 20 }]}>Saved Elite Jobs</Text>
+      <FlatList
+        data={savedJobs}
+        renderItem={({ item }) => (
+          <TouchableOpacity style={[styles.card, { backgroundColor: theme.card, borderColor: theme.border }]}>
+            <Text style={[styles.cardTitle, { color: theme.text }]}>{item.title}</Text>
+            <Text style={{ color: theme.text, fontWeight: '500' }}>{item.company} - {item.location}</Text>
+            <Text style={{ color: theme.button }}>{item.salary}k | {item.category}</Text>
+            <Text style={[styles.cardDescription, { color: theme.text }]}>{item.description.slice(0, 80)}...</Text>
+          </TouchableOpacity>
+        )}
+        keyExtractor={(item) => item.id}
+        contentContainerStyle={{ padding: 20 }}
+      />
     </LinearGradient>
   );
 };
@@ -474,20 +584,20 @@ const FeedbackScreen = () => {
   return (
     <LinearGradient colors={theme.gradient} style={styles.fullScreen}>
       <ScrollView contentContainerStyle={styles.feedbackScroll}>
-        <Text style={[styles.title, { color: theme.text }]}>Share Your Feedback</Text>
+        <Text style={[styles.title, { color: theme.text }]}>Elite Feedback</Text>
         <TextInput
-          style={[styles.input, { borderColor: theme.border, color: theme.text, height: 120 }]}
-          placeholder="Your feedback..."
+          style={[styles.input, { borderColor: theme.border, color: theme.text, height: 120, backgroundColor: theme.inputBackground }]}
+          placeholder="Your Prestigious Thoughts..."
           placeholderTextColor={theme.placeholder}
           value={feedback}
           onChangeText={setFeedback}
           multiline
         />
-        <Text style={[styles.subtitle, { color: theme.text }]}>Rate Us (1-5):</Text>
+        <Text style={[styles.subtitle, { color: theme.text }]}>Rate Our Service (1-5):</Text>
         <View style={styles.ratingRow}>
           {[1, 2, 3, 4, 5].map(num => (
             <TouchableOpacity key={num} onPress={() => setRating(num)}>
-              <Ionicons name={rating >= num ? 'star' : 'star-outline'} size={40} color={theme.button} />
+              <Ionicons name={rating >= num ? 'star' : 'star-outline'} size={45} color={theme.button} />
             </TouchableOpacity>
           ))}
         </View>
@@ -508,6 +618,7 @@ const ProfileScreen = () => {
   const [skills, setSkills] = useState([]);
   const [newSkill, setNewSkill] = useState('');
   const [experience, setExperience] = useState('');
+  const [portfolio, setPortfolio] = useState([]);
   const [popup, setPopup] = useState(null);
   const { theme } = useTheme();
 
@@ -521,6 +632,7 @@ const ProfileScreen = () => {
         setCoverPhoto(storedUser.coverPhoto || null);
         setSkills(storedUser.skills || []);
         setExperience(storedUser.experience || '');
+        setPortfolio(storedUser.portfolio || []);
       }
     };
     loadUser();
@@ -541,7 +653,8 @@ const ProfileScreen = () => {
     if (!result.canceled && result.assets) {
       const uri = result.assets[0].uri;
       if (type === 'profile') setProfilePhoto(uri);
-      else setCoverPhoto(uri);
+      else if (type === 'cover') setCoverPhoto(uri);
+      else setPortfolio([...portfolio, uri]);
       setPopup('Image Uploaded');
       setTimeout(() => setPopup(null), 1000);
     }
@@ -558,9 +671,13 @@ const ProfileScreen = () => {
     setSkills(skills.filter(s => s !== skill));
   };
 
+  const removePortfolioItem = (uri) => {
+    setPortfolio(portfolio.filter(item => item !== uri));
+  };
+
   const handleSave = async () => {
-    if (bio || profilePhoto || coverPhoto || skills.length || experience) {
-      const updatedUser = { ...user, bio, profilePhoto, coverPhoto, skills, experience };
+    if (bio || profilePhoto || coverPhoto || skills.length || experience || portfolio.length) {
+      const updatedUser = { ...user, bio, profilePhoto, coverPhoto, skills, experience, portfolio };
       await storeData('user', updatedUser);
       setUser(updatedUser);
       setPopup('Profile Saved');
@@ -573,31 +690,31 @@ const ProfileScreen = () => {
   return (
     <LinearGradient colors={theme.gradient} style={styles.fullScreen}>
       <ScrollView contentContainerStyle={styles.profileScroll}>
-        <Image source={{ uri: coverPhoto || 'https://via.placeholder.com/300x200' }} style={styles.coverPhoto} />
-        <Image source={{ uri: profilePhoto || 'https://via.placeholder.com/150' }} style={[styles.profilePhoto, { borderColor: theme.border }]} />
-        <Text style={[styles.title, { color: theme.text }]}>{user?.name || 'Guest'}</Text>
+        <Image source={{ uri: coverPhoto || 'https://via.placeholder.com/300x250' }} style={styles.coverPhoto} />
+        <Image source={{ uri: profilePhoto || 'https://via.placeholder.com/160' }} style={[styles.profilePhoto, { borderColor: theme.border }]} />
+        <Text style={[styles.title, { color: theme.text }]}>{user?.name || 'Elite Member'}</Text>
         <Text style={[styles.subtitle, { color: theme.text }]}>{user?.email || 'No email'}</Text>
         <TextInput
-          style={[styles.input, { borderColor: theme.border, color: theme.text }]}
-          placeholder="Your bio"
+          style={[styles.input, { borderColor: theme.border, color: theme.text, backgroundColor: theme.inputBackground }]}
+          placeholder="Your Elite Bio"
           placeholderTextColor={theme.placeholder}
           value={bio}
           onChangeText={setBio}
         />
         <TextInput
-          style={[styles.input, { borderColor: theme.border, color: theme.text, height: 100 }]}
-          placeholder="Work Experience"
+          style={[styles.input, { borderColor: theme.border, color: theme.text, height: 120, backgroundColor: theme.inputBackground }]}
+          placeholder="Professional Experience"
           placeholderTextColor={theme.placeholder}
           value={experience}
           onChangeText={setExperience}
           multiline
         />
         <View style={styles.skillSection}>
-          <Text style={[styles.subtitle, { color: theme.text }]}>Skills</Text>
+          <Text style={[styles.subtitle, { color: theme.text }]}>Elite Skills</Text>
           <View style={styles.skillInputRow}>
             <TextInput
-              style={[styles.input, { borderColor: theme.border, color: theme.text, flex: 1 }]}
-              placeholder="Add a skill"
+              style={[styles.input, { borderColor: theme.border, color: theme.text, flex: 1, backgroundColor: theme.inputBackground }]}
+              placeholder="Add a Skill"
               placeholderTextColor={theme.placeholder}
               value={newSkill}
               onChangeText={setNewSkill}
@@ -608,13 +725,40 @@ const ProfileScreen = () => {
           </View>
           <View style={styles.skillList}>
             {skills.map(skill => (
-              <View key={skill} style={[styles.skillTag, { backgroundColor: theme.card }]}>
+              <View key={skill} style={[styles.skillTag, { backgroundColor: theme.card, borderColor: theme.border }]}>
                 <Text style={{ color: theme.text }}>{skill}</Text>
                 <TouchableOpacity onPress={() => removeSkill(skill)}>
                   <Ionicons name="close" size={20} color={theme.text} />
                 </TouchableOpacity>
               </View>
             ))}
+          </View>
+        </View>
+        <View style={styles.portfolioSection}>
+          <Text style={[styles.subtitle, { color: theme.text }]}>Portfolio</Text>
+          <TouchableOpacity style={[styles.button, { backgroundColor: theme.button }]} onPress={() => handleImagePick('portfolio')}>
+            <Text style={styles.buttonText}>Add Portfolio Item</Text>
+          </TouchableOpacity>
+          <FlatList
+            horizontal
+            data={portfolio}
+            renderItem={({ item }) => (
+              <View style={styles.portfolioItem}>
+                <Image source={{ uri: item }} style={styles.portfolioImage} />
+                <TouchableOpacity style={styles.removePortfolio} onPress={() => removePortfolioItem(item)}>
+                  <Ionicons name="trash" size={20} color={theme.button} />
+                </TouchableOpacity>
+              </View>
+            )}
+            keyExtractor={(item, index) => index.toString()}
+          />
+        </View>
+        <View style={styles.analyticsSection}>
+          <Text style={[styles.subtitle, { color: theme.text }]}>Analytics</Text>
+          <View style={[styles.statCard, { backgroundColor: theme.card, borderColor: theme.border }]}>
+            <Ionicons name="paper-plane" size={40} color={theme.button} />
+            <Text style={[styles.statNumber, { color: theme.text }]}>{user?.applications || 0}</Text>
+            <Text style={{ color: theme.text, fontWeight: 'bold' }}>Applications Submitted</Text>
           </View>
         </View>
         <TouchableOpacity style={[styles.button, { backgroundColor: theme.button }]} onPress={() => handleImagePick('profile')}>
@@ -624,7 +768,7 @@ const ProfileScreen = () => {
           <Text style={styles.buttonText}>Change Cover Photo</Text>
         </TouchableOpacity>
         <TouchableOpacity style={[styles.button, { backgroundColor: theme.button }]} onPress={handleSave}>
-          <Text style={styles.buttonText}>Save Profile</Text>
+          <Text style={styles.buttonText}>Save Elite Profile</Text>
         </TouchableOpacity>
         {popup && <Popup message={popup} onClose={() => setPopup(null)} />}
       </ScrollView>
@@ -641,7 +785,7 @@ const SettingsScreen = () => {
   return (
     <LinearGradient colors={theme.gradient} style={styles.fullScreen}>
       <ScrollView contentContainerStyle={styles.settingsScroll}>
-        <Text style={[styles.title, { color: theme.text }]}>Settings</Text>
+        <Text style={[styles.title, { color: theme.text }]}>Elite Settings</Text>
         <View style={styles.settingRow}>
           <Text style={[styles.settingLabel, { color: theme.text }]}>Dark Mode</Text>
           <Switch value={theme === darkTheme} onValueChange={toggleTheme} trackColor={{ true: theme.button }} thumbColor="#fff" />
@@ -669,12 +813,13 @@ const MainTabs = () => {
   return (
     <Tab.Navigator
       screenOptions={({ route }) => ({
-        tabBarStyle: { backgroundColor: theme.background, borderTopColor: theme.border, paddingVertical: 10, height: 70 },
-        tabBarLabelStyle: { color: theme.text, fontSize: 12, fontWeight: 'bold' },
+        tabBarStyle: { backgroundColor: theme.background, borderTopColor: theme.border, paddingVertical: 10, height: 80, elevation: 10 },
+        tabBarLabelStyle: { color: theme.text, fontSize: 14, fontWeight: 'bold' },
         tabBarIcon: ({ color, size }) => {
           let iconName;
           if (route.name === 'Home') iconName = 'home';
           else if (route.name === 'Jobs') iconName = 'briefcase';
+          else if (route.name === 'Saved') iconName = 'bookmark';
           else if (route.name === 'Feedback') iconName = 'chatbox';
           else if (route.name === 'Profile') iconName = 'person';
           else if (route.name === 'Settings') iconName = 'settings';
@@ -686,6 +831,7 @@ const MainTabs = () => {
     >
       <Tab.Screen name="Home" component={HomeScreen} />
       <Tab.Screen name="Jobs" component={JobScreen} />
+      <Tab.Screen name="Saved" component={SavedJobsScreen} />
       <Tab.Screen name="Feedback" component={FeedbackScreen} />
       <Tab.Screen name="Profile" component={ProfileScreen} />
       <Tab.Screen name="Settings" component={SettingsScreen} />
@@ -734,18 +880,20 @@ const lightTheme = {
   placeholder: '#888',
   link: '#007bff',
   gradient: ['#e6f0ff', '#f5f5f5'],
+  inputBackground: 'rgba(255, 255, 255, 0.9)',
 };
 
 const darkTheme = {
-  background: '#1a1a1a',
-  text: '#fff',
-  border: '#ff4444',
-  card: '#333',
-  button: '#ff4444',
-  popupBackground: '#ff4444',
-  placeholder: '#aaa',
+  background: '#0d0d0d',
+  text: '#e0e0e0',
+  border: '#ff4d4d',
+  card: 'rgba(40, 40, 40, 0.8)',
+  button: '#ff4d4d',
+  popupBackground: '#ff4d4d',
+  placeholder: '#999',
   link: '#ff6666',
-  gradient: ['#2a2a2a', '#1a1a1a'],
+  gradient: ['#2a2a2a', '#0d0d0d'],
+  inputBackground: 'rgba(50, 50, 50, 0.8)',
 };
 
 // Styles
@@ -753,89 +901,122 @@ const styles = StyleSheet.create({
   fullScreen: { flex: 1 },
   onboardingScroll: { flexGrow: 1, padding: 40, justifyContent: 'center', alignItems: 'center' },
   authScroll: { flexGrow: 1, padding: 40, justifyContent: 'center', alignItems: 'center' },
-  homeScroll: { flexGrow: 1, padding: 20, alignItems: 'center' },
-  applicationScroll: { flexGrow: 1, padding: 20 },
-  feedbackScroll: { flexGrow: 1, padding: 20, alignItems: 'center' },
-  profileScroll: { flexGrow: 1, padding: 20 },
-  settingsScroll: { flexGrow: 1, padding: 20 },
-  onboardingImage: { width: 200, height: 200, marginBottom: 30, borderRadius: 100 },
-  logo: { width: 150, height: 150, marginBottom: 30, borderRadius: 75, borderWidth: 2, borderColor: '#ddd' },
-  title: { fontSize: 34, fontWeight: 'bold', marginBottom: 15, textAlign: 'center' },
-  subtitle: { fontSize: 20, marginBottom: 20, textAlign: 'center', fontWeight: '500' },
+  homeScroll: { flexGrow: 1, padding: 30, alignItems: 'center' },
+  applicationScroll: { flexGrow: 1, padding: 30 },
+  feedbackScroll: { flexGrow: 1, padding: 30, alignItems: 'center' },
+  profileScroll: { flexGrow: 1, padding: 30 },
+  settingsScroll: { flexGrow: 1, padding: 30 },
+  onboardingImage: { width: 220, height: 220, marginBottom: 40, borderRadius: 110, borderWidth: 3, borderColor: '#ff4d4d' },
+  logo: { width: 160, height: 160, marginBottom: 40, borderRadius: 80, borderWidth: 3, borderColor: '#ff4d4d' },
+  title: { fontSize: 36, fontWeight: '800', marginBottom: 20, textAlign: 'center', textShadowColor: 'rgba(0, 0, 0, 0.2)', textShadowOffset: { width: 1, height: 1 }, textShadowRadius: 5 },
+  subtitle: { fontSize: 22, marginBottom: 25, textAlign: 'center', fontWeight: '600' },
   input: {
     borderWidth: 1,
-    padding: 15,
-    marginVertical: 10,
-    borderRadius: 12,
+    padding: 18,
+    marginVertical: 12,
+    borderRadius: 15,
     fontSize: 16,
     width: '100%',
-    backgroundColor: 'rgba(255, 255, 255, 0.1)',
-  },
-  button: {
-    padding: 15,
-    borderRadius: 12,
-    alignItems: 'center',
-    marginVertical: 10,
-    width: '100%',
-    elevation: 3,
-  },
-  smallButton: {
-    padding: 10,
-    borderRadius: 8,
-    alignItems: 'center',
-    width: '20%',
-  },
-  buttonText: { color: '#fff', fontSize: 16, fontWeight: 'bold' },
-  authLinks: { flexDirection: 'row', justifyContent: 'space-between', width: '100%', marginTop: 20 },
-  link: { fontSize: 16, fontWeight: 'bold' },
-  banner: { width: '100%', height: 200, borderRadius: 15, marginVertical: 20 },
-  stats: { flexDirection: 'row', justifyContent: 'space-around', width: '100%' },
-  statCard: { padding: 20, borderRadius: 15, alignItems: 'center', width: '45%', elevation: 2 },
-  statNumber: { fontSize: 32, fontWeight: 'bold', marginVertical: 5 },
-  categoryScroll: { marginVertical: 10, paddingHorizontal: 10 },
-  categoryButton: { padding: 12, borderRadius: 25, marginHorizontal: 5 },
-  categoryText: { fontSize: 14, fontWeight: 'bold' },
-  card: {
-    padding: 20,
-    marginVertical: 10,
-    borderRadius: 15,
-    elevation: 5,
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 3 },
+    shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.2,
     shadowRadius: 5,
   },
-  cardTitle: { fontSize: 20, fontWeight: 'bold', marginBottom: 5 },
-  cardDescription: { fontSize: 14, marginVertical: 10 },
-  modalOverlay: { flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: 'rgba(0, 0, 0, 0.5)' },
-  modalContent: { width: '90%', padding: 20, borderRadius: 15, maxHeight: '80%' },
-  modalButtons: { flexDirection: 'row', justifyContent: 'space-between', marginTop: 20 },
-  coverPhoto: { width: '100%', height: 250, marginBottom: 20, borderRadius: 15 },
-  profilePhoto: {
-    width: 150,
-    height: 150,
-    borderRadius: 75,
-    borderWidth: 4,
-    alignSelf: 'center',
-    marginBottom: 20,
-  },
-  skillSection: { width: '100%', marginVertical: 20 },
-  skillInputRow: { flexDirection: 'row', alignItems: 'center', marginBottom: 10 },
-  skillList: { flexDirection: 'row', flexWrap: 'wrap' },
-  skillTag: { flexDirection: 'row', alignItems: 'center', padding: 10, borderRadius: 20, margin: 5 },
-  popup: {
-    position: 'absolute',
-    top: 60,
-    left: 20,
-    right: 20,
-    padding: 20,
+  button: {
+    padding: 18,
     borderRadius: 15,
     alignItems: 'center',
-    elevation: 10,
+    marginVertical: 12,
+    width: '100%',
+    elevation: 5,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.3,
+    shadowRadius: 5,
   },
-  popupText: { color: '#fff', fontSize: 18, fontWeight: 'bold' },
-  popupClose: { color: '#fff', fontSize: 14, marginTop: 10 },
-  ratingRow: { flexDirection: 'row', justifyContent: 'space-around', marginVertical: 20, width: '80%' },
-  settingRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginVertical: 20 },
-  settingLabel: { fontSize: 18, fontWeight: 'bold' },
+  smallButton: {
+    padding: 12,
+    borderRadius: 10,
+    alignItems: 'center',
+    width: '25%',
+  },
+  buttonText: { color: '#fff', fontSize: 18, fontWeight: 'bold' },
+  authLinks: { flexDirection: 'row', justifyContent: 'space-between', width: '100%', marginTop: 25 },
+  link: { fontSize: 16, fontWeight: 'bold', textDecorationLine: 'underline' },
+  banner: { width: '100%', height: 220, borderRadius: 20, marginVertical: 25, borderWidth: 2, borderColor: '#ff4d4d' },
+  stats: { flexDirection: 'row', justifyContent: 'space-around', width: '100%' },
+  statCard: { padding: 25, borderRadius: 20, alignItems: 'center', width: '45%', borderWidth: 1, elevation: 5 },
+  statNumber: { fontSize: 36, fontWeight: 'bold', marginVertical: 10 },
+  filterContainer: { paddingVertical: 10 },
+  categoryScroll: { marginVertical: 5, paddingHorizontal: 10, height: 40 }, // Fixed height for visibility
+  categoryButton: { padding: 10, borderRadius: 30, marginHorizontal: 8, borderWidth: 1, elevation: 2, justifyContent: 'center' },
+  categoryText: { fontSize: 14, fontWeight: 'bold' },
+  card: {
+    padding: 25,
+    marginVertical: 12,
+    borderRadius: 20,
+    borderWidth: 1,
+    elevation: 8,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+  },
+  cardTitle: { fontSize: 22, fontWeight: 'bold', marginBottom: 8 },
+  cardDescription: { fontSize: 15, marginVertical: 10 },
+  cardActions: { flexDirection: 'row', justifyContent: 'flex-end', marginTop: 10 },
+  modalOverlay: { flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: 'rgba(0, 0, 0, 0.7)' },
+  modalContent: { width: '90%', padding: 30, borderRadius: 20, elevation: 10, maxHeight: '85%' },
+  modalButtons: { flexDirection: 'row', justifyContent: 'space-between', marginTop: 25 },
+  coverPhoto: { width: '100%', height: 280, marginBottom: 25, borderRadius: 20, borderWidth: 2, borderColor: '#ff4d4d' },
+  profilePhoto: {
+    width: 160,
+    height: 160,
+    borderRadius: 80,
+    borderWidth: 4,
+    alignSelf: 'center',
+    marginBottom: 25,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 5 },
+    shadowOpacity: 0.4,
+    shadowRadius: 10,
+  },
+  skillSection: { width: '100%', marginVertical: 25 },
+  portfolioSection: { width: '100%', marginVertical: 25 },
+  analyticsSection: { width: '100%', marginVertical: 25 },
+  skillInputRow: { flexDirection: 'row', alignItems: 'center', marginBottom: 15 },
+  skillList: { flexDirection: 'row', flexWrap: 'wrap' },
+  skillTag: { flexDirection: 'row', alignItems: 'center', padding: 12, borderRadius: 25, margin: 8, borderWidth: 1 },
+  portfolioItem: { position: 'relative', marginRight: 15 },
+  portfolioImage: { width: 120, height: 120, borderRadius: 15, borderWidth: 1, borderColor: '#ff4d4d' },
+  removePortfolio: { position: 'absolute', top: 5, right: 5, backgroundColor: 'rgba(0, 0, 0, 0.5)', borderRadius: 15, padding: 5 },
+  popup: {
+    position: 'absolute',
+    top: 70,
+    left: 30,
+    right: 30,
+    padding: 25,
+    borderRadius: 20,
+    alignItems: 'center',
+    elevation: 15,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 5 },
+    shadowOpacity: 0.4,
+    shadowRadius: 10,
+  },
+  popupText: { color: '#fff', fontSize: 20, fontWeight: 'bold' },
+  popupClose: { color: '#fff', fontSize: 16, marginTop: 12 },
+  ratingRow: { flexDirection: 'row', justifyContent: 'space-around', marginVertical: 25, width: '85%' },
+  settingRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginVertical: 25 },
+  settingLabel: { fontSize: 20, fontWeight: 'bold' },
+  notificationBanner: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    padding: 15,
+    borderRadius: 15,
+    marginBottom: 20,
+    elevation: 5,
+  },
+  notificationText: { color: '#fff', fontSize: 16, fontWeight: 'bold' },
 });
